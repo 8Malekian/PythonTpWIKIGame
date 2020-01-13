@@ -1,33 +1,33 @@
-# Python 3
-# Extraction des liens d'une page web
 from bs4 import BeautifulSoup
 import urllib.request
+import re
 import sys
 
-param1 = str(sys.argv[1]).replace(' ', '+')
-param2 = str(sys.argv[2]).replace(' ', '+')
 
+def extract(val):
+    #val = input("donner moi les noms de la recherche")
 
-def nbResultat(recherche):
-    with urllib.request.urlopen('http://www.ecosia.org/search?q='+recherche) as response:
+    sortie="0"
+    with urllib.request.urlopen('https://www.ecosia.org/search?q={}'.format(val)) as response:
         webpage = response.read()
         soup = BeautifulSoup(webpage, 'html.parser')
-        for anchor in soup.find_all('span', class_="result-count"):
-            text = str(anchor.getText().strip())
-            if text.find("results") != -1:
-                r = text.split(' ')[0]
-                return r
+        for anchor in soup.find_all('span',{"class": "result-count"}):
+            result=str(anchor.get_text()).strip().split(" ")[0]
+            sortie=int(result.replace(",",""))
+    return sortie
+        #print("le resultat est ")
+        #print(str(sortie) ) 
+
+def calculeTheBest(proposition1,proposition2):
+         
+    val1= extract(proposition1)
+    val2= extract(proposition2)
+    if val1<val2:
+            print ("c'est {} qui gagne".format(proposition1), round ((val1/(val1+val2))*100, 2), "%")
+    if val1>val2:
+            print ("c'est {} qui gagne".format(proposition2), round ((val1/(val2+val1))*100, 2), "%") 
 
 
-def calculEtAffiche(param1, param2):
-    nbParam1 = int(nbResultat(param1).replace(',', ''))
-    nbParam2 = int(nbResultat(param2).replace(',', ''))
-    if(nbParam1 > nbParam2):
-        print(param1, 'gagne avec', round(
-            (nbParam1/(nbParam1+nbParam2))*100, 2), '%')
-    else:
-        print(param2, 'gagne avec', round(
-            (nbParam2/(nbParam2+nbParam1))*100, 2), '%')
-
-
-calculEtAffiche(param1, param2)
+var1 =input("propo1")
+var2 =input("propo2")
+calculeTheBest(var1,var2)     
