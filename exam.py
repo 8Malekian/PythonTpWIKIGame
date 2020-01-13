@@ -3,7 +3,6 @@ import urllib.request
 import re
 import sys
 
-
 def extract(val):
     #val = input("donner moi les noms de la recherche")
 
