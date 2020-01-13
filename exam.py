@@ -3,20 +3,23 @@ import urllib.request
 import re
 import sys
 
-def extract(val):
-    #val = input("donner moi les noms de la recherche")
+def extract():
+    
 
     sortie="0"
-    with urllib.request.urlopen('https://www.ecosia.org/search?q={}'.format(val)) as response:
+    with urllib.request.urlopen("https://fr.wikipedia.org/wiki/Sp%C3%A9cial:Page_au_hasard") as response:
         webpage = response.read()
         soup = BeautifulSoup(webpage, 'html.parser')
-        for anchor in soup.find_all('span',{"class": "result-count"}):
+        for anchor in soup.find_all('h1',{"class": "firstHeading"}):
             result=str(anchor.get_text()).strip().split(" ")[0]
-            sortie=int(result.replace(",",""))
+            sortie=str(result.replace(",",""))
+    
+        print("le resultat est ")
+        print(str(sortie) ) 
     return sortie
-        #print("le resultat est ")
-        #print(str(sortie) ) 
+extract()
 
+"""
 def calculeTheBest(proposition1,proposition2):
          
     val1= extract(proposition1)
@@ -29,4 +32,5 @@ def calculeTheBest(proposition1,proposition2):
 
 var1 =input("propo1")
 var2 =input("propo2")
-calculeTheBest(var1,var2)     
+calculeTheBest(var1,var2) 
+"""    
