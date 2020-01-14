@@ -2,20 +2,25 @@ from bs4 import BeautifulSoup
 import urllib.request
 import re
 import sys
-# extraction du titre d'une page aléatoire
 
+#extraction du titre
+def extractPage(url):
+    with urllib.request.urlopen(url) as response:
+        webpage = response.read()
+        soup = BeautifulSoup(webpage, 'html.parser')
+    return soup
 
 def extract():
     sortie = "0"
-    with urllib.request.urlopen("https://fr.wikipedia.org/wiki/Sp%C3%A9cial:Page_au_hasard") as response:
-        webpage = response.read()
-        soup = BeautifulSoup(webpage, 'html.parser')
-        for anchor in soup.find_all('h1', {"class": "firstHeading"}):
+    url="https://fr.wikipedia.org/wiki/Sp%C3%A9cial:Page_au_hasard"
+    soup=extractPage(url)
+    for anchor in soup.find_all('h1', {"class": "firstHeading"}):
             result = str(anchor.get_text()).strip().split(" ")[0]
             sortie = str(result.replace(",", ""))
 
         #print("le resultat est ")
-        #print(str(sortie) )
+        #print(str(sortie) )    
+        
     return sortie
 
 
