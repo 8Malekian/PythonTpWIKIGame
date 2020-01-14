@@ -33,62 +33,69 @@ def extract():
         # print(str(sortie) )
 
     return sortie
+def affichage(list,cherche):
+    if len(list)<20:
+      for i in range(len(list)):
+          print(i," - ",list[i].nom)  
+    else:
+        for i in range(cherche,20,1):
+            print(i," - ",list[i].nom) 
+        
 
 
-extract()
-# extraction du l'ensemble des liens d'un page
-
-
-def extractall():
+# extraction du l'ensemble des liens d'un page sous forme d'un tableau d'objet link
+def extractall(elem):
     sortie=[]
     i = 0
 
-    url = "https://fr.wikipedia.org/wiki/Python_(langage)"
+    url = "https://fr.wikipedia.org/wiki/{}".format(elem)
+    
 
     soup = extractPage(url)
 
-    for jumpLink in soup.find_all("div", {'class':["toc","navbox-container","homonymie","image","reference-cadre"]}):
-            jumpLink.extract()
-    
+    for jumpLink in soup.find_all("div", {'class':["toc","navbox-container","homonymie","image","reference-cadre","noprint plainlinksneverexpand nowrap tnavbar"]}):
+            jumpLink.extract()    
     for jumpLink in soup.find_all("table", {'class':["infobox_v2","infobox_v3","infobox"]}):
-            jumpLink.extract()
-   
+            jumpLink.extract()   
     for jumpLink in soup.find_all("a", {'class':["mw-redirect","extiw","internal"]}):
-            jumpLink.extract()
-   
+            jumpLink.extract()   
     for jumpLink in soup.find_all("span", {'class':["mw-editsection","indicateur-langue"]}):
-            jumpLink.extract()
-    
+            jumpLink.extract()    
     for jumpLink in soup.find_all("ul", class_="bandeau-portail"):
-            jumpLink.extract()
-   
-    
-    
+            jumpLink.extract()       
     for jumpLink in soup.find_all("sup", class_="reference"):
-            jumpLink.extract()
-  
+            jumpLink.extract()  
+            
+    for anchor in soup.find('div', class_="mw-parser-output").find_all('a',attrs={'href': re.compile("/wiki/")}):
+        anchorText=str(anchor.getText())
+        if anchorText.strip()!="":
+               
+            i += 1
+            # print(anchor.getText())
+
+            sortie.append(Link(str(anchor.getText()),i,anchor.get("href")))    
+            #print(i)
+    return sortie
+"""
+extractall("python")
+
+"""
+def Main():
+    nbTour=0
+    proposition=[]
+    startList=0
+    actuel=""
+    print("************************ WikiGame **** Tour : {}".format(nbTour+1))
+    depart= extract()
+    actuel=depart
+    print("Départ :{}".format(depart))
+    cible= extract()
+    print("Cible :{}".format(cible))
+    if (nbTour==0):
+        print("Actuellement :{}".format(depart))
+    else: 
+        print("Actuellment :{}".format(actuel))
     
-    for anchor in soup.find('div', class_="mw-parser-output").find_all('a'):
-        i += 1
-        print(anchor.getText())
-        sortie.append(anchor.getText())    
-    print(i)
-
-
-extractall()
-
-"""
-def calculeTheBest(proposition1,proposition2):
-         
-    val1= extract(proposition1)
-    val2= extract(proposition2)
-    if val1<val2:
-            print ("c'est {} qui gagne".format(proposition1), round ((val1/(val1+val2))*100, 2), "%")
-    if val1>val2:
-            print ("c'est {} qui gagne".format(proposition2), round ((val1/(val2+val1))*100, 2), "%") 
-
-
-var1 =input("propo1")
-var2 =input("propo2")
-calculeTheBest(var1,var2) 
-"""
+    proposition.append(extractall(actuel))
+    affichage(proposition[0],startList)
+Main()   
