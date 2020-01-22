@@ -185,5 +185,81 @@ def Main():
     print("Bravos, vous avez gagnez en {} de tours".format (nbTour+1))
                     
 
+    
+
+
+
+def interface():
+    root =Tk()
+    positionTour=0
+    nbTour=0
+    listeDesPropositions = Listbox()
+    choixNonvalider=True
+    proposition=[]
+    defaite= True
+    choixJoueur=0
+    startList=0
+
+    actuel=""
+    depart= extract()
+    precedent=depart
+    actuel=depart
+    cible= extract()
+    proposition.append(extractall(actuel.url))
+
+
+    def up(depart,list):
+        depart+=20
+        affichageList(depart,list)
+    def down(depart,list):
+        if depart>0:
+            depart-=20
+            affichageList(depart,list)   
+       
+    def affichageList(depart,list):
+        
+        
+        if len(list)<20:
+            listeDesPropositions.delete(0,'end')
+            for i in range(len(list)):
+                listeDesPropositions.insert(i,(i, list[i].nom))
+        else:
+            listeDesPropositions.delete(0,'end')
+            for i in range(depart,(depart+21),1):
+                if i<len(list):
+                    listeDesPropositions.insert(i,(i, list[i].nom)) 
+                
+
+
+
+    root.title('************************ WikiGame ********************')
+        
+    Label(root,
+              text ="Départ :{}".format(depart.nom)).grid(row =2)
+    Label(root,
+              text ="Cible :{}".format(cible.nom)).grid(row =3)
+    if (positionTour==0):
+            Label(root,
+              text ="Actuellement :{}".format(depart.nom)).grid(row =4)                
+    else:
+            Label(root,
+              text ="Actuellement :{}".format(actuel.nom)).grid(row =4) 
+    listeDesPropositions = Listbox(root, width=30, height=25)
+    listeDesPropositions.grid(row=5, column=0, padx=15, pady=15,sticky = E)
+    affichageList(startList,proposition[positionTour])
+    """    
+    Button(root, text ='suivant',
+               command = up(startList,proposition[positionTour])).grid(row =5, sticky = W)
+    Button(root, text ='précedent',
+               command =down(startList,proposition[positionTour])).grid(row =5, sticky = W)
+    
+      """
+    root.mainloop()
+
+   
+
+
+interface()     
+    
 #extract()   
-Main()   
+#Main()   
