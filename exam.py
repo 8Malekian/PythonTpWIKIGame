@@ -1,11 +1,22 @@
 from bs4 import BeautifulSoup
 from urllib.parse import unquote_plus
 from tkinter import *
-
+from urllib import parse
 import urllib.request
+import urllib
+
 import re
 import sys
 
+startList=0
+positionTour=0
+nbTour=0
+choixNonvalider=True
+proposition=[]
+defaite= True
+choixJoueur=0
+startList=0
+actuel=""
 
 
 
@@ -19,12 +30,23 @@ class Link():
 # extraction du de la page internet
 
 def extractPage(url):
-    print(url)
-    with urllib.request.urlopen(url) as response:
-        webpage = response.read()
-        soup = BeautifulSoup(webpage, 'html.parser')
     
-    return soup
+    print('ici',url)
+    try:
+        with urllib.request.urlopen(url) as response:
+            webpage = response.read()
+            soup = BeautifulSoup(webpage, 'html.parser')
+        return soup
+    except:
+        url = urllib.parse.urlsplit(url)
+        url = list(url)
+        url[2] = urllib.parse.quote(url[2])
+        url = urllib.parse.urlunsplit(url)
+        print('exe',url)
+        with urllib.request.urlopen(url) as response:
+            webpage = response.read()
+            soup = BeautifulSoup(webpage, 'html.parser')
+        return soup
 #validation du choix du joueur
 
 def validationChoix(startList):
@@ -126,18 +148,7 @@ def gagnant(choix,cible):
 
 
 def Main():
-    positionTour=0
-    nbTour=0
-    choixNonvalider=True
-    proposition=[]
-    defaite= True
-    choixJoueur=0
-    startList=0
-    actuel=""
-    depart= extract()
-    precedent=depart
-    actuel=depart
-    cible= extract()
+   
     
     while defaite:
         choixNonvalider= True
@@ -192,14 +203,14 @@ def Main():
 def interface():
     root =Tk()
     positionTour=0
-    nbTour=0
-    listeDesPropositions = Listbox()
+    
+    
     choixNonvalider=True
     proposition=[]
     defaite= True
     choixJoueur=0
     startList=0
-
+    listeDesPropositions = Listbox()
     actuel=""
     depart= extract()
     precedent=depart
@@ -208,17 +219,24 @@ def interface():
     proposition.append(extractall(actuel.url))
 
 
-    def up(depart,list):
-        depart+=20
-        affichageList(depart,list)
-    def down(depart,list):
-        if depart>0:
-            depart-=20
-            affichageList(depart,list)   
-       
+    def up(list):
+        print("up")
+        global startList 
+        startList += 20
+        affichageList(startList,list)
+    def down(list):
+        print("down")
+        global startList 
+        if startList>0:
+            startList -= 20
+            affichageList(startList,list)   
+    def back(list):
+        print("up")
+        global startList 
+        startList += 20
+        affichageList(startList,list)   
     def affichageList(depart,list):
-        
-        
+               
         if len(list)<20:
             listeDesPropositions.delete(0,'end')
             for i in range(len(list)):
@@ -228,32 +246,72 @@ def interface():
             for i in range(depart,(depart+21),1):
                 if i<len(list):
                     listeDesPropositions.insert(i,(i, list[i].nom)) 
+    
+    def validationChoixFrame():
+        choixJoueur=propoEntry.get()
+        global startList
+        print (startList)
+        try:
+                choixJoueur=int(choixJoueur)
                 
+                if (choixJoueur >= startList and choixJoueur <= startList+20):        
+                    finalchoice=choixJoueur
+                    return finalchoice     
+                else:
+                    labelError.config(text="Entrer un nombre entre {} et  {} ".format(startList,startList+20))
+                    return-1
+            
+        except ValueError:
+                    labelError.config(text="Entrer un nombre entre {} et  {} ".format(startList,startList+20))
+                    return -1
+    
+    def validation():
+        
+        if gagnant(actuel.url,cible.url):
+            print("fff")          
+            
+        if nbTour>1:
+            PageactuelLabel.config(text="Actuellement :{}".format(actuel.nom))
+        
+        foo = validationChoixFrame()
+              
+        print(foo)            
 
 
 
     root.title('************************ WikiGame ********************')
-        
-    Label(root,
-              text ="Départ :{}".format(depart.nom)).grid(row =2)
-    Label(root,
-              text ="Cible :{}".format(cible.nom)).grid(row =3)
-    if (positionTour==0):
-            Label(root,
-              text ="Actuellement :{}".format(depart.nom)).grid(row =4)                
-    else:
-            Label(root,
-              text ="Actuellement :{}".format(actuel.nom)).grid(row =4) 
-    listeDesPropositions = Listbox(root, width=30, height=25)
-    listeDesPropositions.grid(row=5, column=0, padx=15, pady=15,sticky = E)
-    affichageList(startList,proposition[positionTour])
-    """    
-    Button(root, text ='suivant',
-               command = up(startList,proposition[positionTour])).grid(row =5, sticky = W)
-    Button(root, text ='précedent',
-               command =down(startList,proposition[positionTour])).grid(row =5, sticky = W)
+    root.geometry("400x550")
+    topFrame=Frame(root, width =400, height =50).grid(row=0,columnspan=2)
+    Label(topFrame,
+              text ="Départ :{}".format(depart.nom)).grid(row =0)
+    Label(topFrame,
+              text ="Cible :{}".format(cible.nom)).grid(row =1)
+    PageactuelLabel=Label(topFrame,
+            text ="Actuellement :{}".format(depart.nom)).grid(row =2)                
     
-      """
+    listFrame=Frame(root).grid(row=4)
+
+    listeDesPropositions = Listbox(listFrame,width=40, height= 22)
+    listeDesPropositions.grid(row=4, column=0,ipady=5)
+    
+    affichageList(startList,proposition[positionTour])
+    frameNavigBouton=Frame(listFrame)
+    frameNavigBouton.grid(row=4,column=1)   
+    Button(frameNavigBouton, text ='suivant',
+               command = lambda: up(proposition[positionTour]),height="2",width="8").grid(row =4,column=1, sticky = W)
+    Button(frameNavigBouton, text ='précedent',
+               command = lambda: down(proposition[positionTour]),height="2",width="8").grid(row =5,column=1, sticky = W)
+    Button(frameNavigBouton, text ='retour',
+               command = lambda: back(proposition[positionTour]),height="2",width="8").grid(row =6,column=1, sticky = W)
+    propositionFrame=Frame(root).grid(row=7)
+    propoEntry= Entry(propositionFrame)
+    propoEntry.grid(row=7,column=0)
+    validationButom=Button(propositionFrame,text ='validation', command = validation)
+    validationButom.grid(row=7, column=1, sticky =W)
+    LabelMessage=Label(root, text="Vous étes au tour: {}".format(nbTour+1))
+    LabelMessage.grid(row=8)
+    labelError=Label(root, text="",fg="red")
+    labelError.grid(row=9)
     root.mainloop()
 
    
