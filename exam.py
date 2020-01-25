@@ -235,7 +235,7 @@ def interface():
            
     def back():
         global positionTour
-        if nbTour!=0:
+        if positionTour!=0:
             positionTour-=1
             global startList 
             startList = 0
@@ -243,6 +243,7 @@ def interface():
             del proposition[-1]
             global actuel
             actuel=precedent
+            PageactuelLabel.config(text="Actuellement :{}".format(actuel.nom))
             print(actuel)
             affichageList(startList,proposition[positionTour]) 
 
@@ -286,39 +287,42 @@ def interface():
       
         
         if gagnant(actuel.url,cible.url):
-            print("fff")          
+            LabelMessage.config(text="*********VOUS AVEZ GAGNE******")         
             
-        if positionTour>1:
-            PageactuelLabel.config(text="Actuellement :{}".format(actuel.nom))
-        
-        choix = validationChoixFrame()
-        
-        url=proposition[positionTour][choix]
-        #print(url.url)
-        #print(url.nom)
-        
-        actuel=url
-        proposition.append(extractall(actuel.url))
-        positionTour+=1
-        nbTour+=1
-        startList=0 
-        print(proposition[positionTour][1].nom)
-        affichageList(startList,proposition[positionTour])             
+        else:
+            choix = validationChoixFrame()
+            if choix!=-1:
+            
+                url=proposition[positionTour][choix]
+                #print(url.url)
+                #print(url.nom)
+                
+                actuel=url
+                proposition.append(extractall(actuel.url))
+                positionTour+=1
+                nbTour+=1
+                LabelMessage.config(text="Vous étes au tour: {}".format(nbTour+1))
+                startList=0 
+                print(proposition[positionTour][1].nom)
+                affichageList(startList,proposition[positionTour])             
+            
+                if positionTour>0:
+                    PageactuelLabel.config(text="Actuellement :{}".format(actuel.nom))
                   
 #frame d'affichage
 
     
     root.title('******************** WikiGame ********************')
     root.geometry("400x550")
-    topFrame=Frame(root, width =400, height =50).grid(row=0,columnspan=2)
-    Label(topFrame,
-              text ="Départ :{}".format(depart.nom)).grid(row =0)
-    Label(topFrame,
-              text ="Cible :{}".format(cible.nom)).grid(row =1)
-    PageactuelLabel=Label(topFrame,
-            text ="Actuellement :{}".format(depart.nom)).grid(row =2)                
+    topFrame=Frame(root, width =400, height =50)
+    topFrame.grid(row=0,columnspan=2)
+    Label(topFrame,text ="Départ :{}".format(depart.nom)).grid(row =0)
+    Label(topFrame,text ="Cible :{}".format(cible.nom)).grid(row =1)
+    PageactuelLabel=Label(topFrame,text ="Actuellement :{}".format(depart.nom))
+    PageactuelLabel.grid(row =2)                
     
-    listFrame=Frame(root).grid(row=4)
+    listFrame=Frame(root)
+    listFrame.grid(row=4)
 
     listeDesPropositions = Listbox(listFrame,width=40, height= 22)
     listeDesPropositions.grid(row=4, column=0,ipady=5)
@@ -332,7 +336,8 @@ def interface():
                command = lambda: down(proposition[positionTour]),height="2",width="8").grid(row =5,column=1, sticky = W)
     Button(frameNavigBouton, text ='retour',
                command = lambda: back(),height="2",width="8").grid(row =6,column=1, sticky = W)
-    propositionFrame=Frame(root).grid(row=7)
+    propositionFrame=Frame(root)
+    propositionFrame.grid(row=7)
     propoEntry= Entry(propositionFrame)
     propoEntry.grid(row=7,column=0)
     validationButom=Button(propositionFrame,text ='validation', command = validation)
