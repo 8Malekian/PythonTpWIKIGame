@@ -19,6 +19,7 @@ startList=0
 actuel=""
 cible=""
 root =Tk()
+countdown=30
 
 
 # objet des liens des pages
@@ -218,7 +219,7 @@ def interface():
     actuel=depart
     cible= extract()    
     proposition.append(extractall(actuel.url))
-    
+    root.after_id= None
 
     def up(list):
         print("up")
@@ -226,6 +227,7 @@ def interface():
         startList += 20
         affichageList(startList,list)
         print(startList)
+
     def down(list):
         print("down")
         global startList 
@@ -258,7 +260,19 @@ def interface():
             for i in range(depart,(depart+21),1):
                 if i<len(list):
                     listeDesPropositions.insert(i,(i, list[i].nom)) 
-    
+                    
+    def updatetimer(count):
+        global countdown
+        global nbTour
+        timer.config(text=" Il vous reste {} seconde pour valider votre choix ou perdez un tour".format (str(count)))
+        if count>0:
+            root.after_id=root.after(1000,updatetimer,count-1)
+        if count==0:
+            nbTour+=1
+            LabelMessage.config(text="Vous étes au tour: {}".format(nbTour+1))
+            labelError.config(text="trop lent,vous avez perdu un tour")
+            
+
     def validationChoixFrame():
         choixJoueur=propoEntry.get()
         global startList
@@ -284,6 +298,7 @@ def interface():
         global positionTour
         global cible
         global startList
+        global countdown
       
         
         if gagnant(actuel.url,cible.url):
@@ -304,7 +319,12 @@ def interface():
                 LabelMessage.config(text="Vous étes au tour: {}".format(nbTour+1))
                 startList=0 
                 print(proposition[positionTour][1].nom)
-                affichageList(startList,proposition[positionTour])             
+                affichageList(startList,proposition[positionTour])
+                countdown=30
+                if root.after_id is not None:
+                    root.after_cancel(root.after_id)
+                
+                updatetimer(countdown)             
             
                 if positionTour>0:
                     PageactuelLabel.config(text="Actuellement :{}".format(actuel.nom))
@@ -319,7 +339,9 @@ def interface():
     Label(topFrame,text ="Départ :{}".format(depart.nom)).grid(row =0)
     Label(topFrame,text ="Cible :{}".format(cible.nom)).grid(row =1)
     PageactuelLabel=Label(topFrame,text ="Actuellement :{}".format(depart.nom))
-    PageactuelLabel.grid(row =2)                
+    PageactuelLabel.grid(row =2)
+    timer=Label(topFrame,text=" Il vous reste {} seconde pour valider votre choix ou perdez un tour".format (countdown))
+    timer.grid(row=3)                
     
     listFrame=Frame(root)
     listFrame.grid(row=4)
@@ -346,6 +368,8 @@ def interface():
     LabelMessage.grid(row=8)
     labelError=Label(root, text="",fg="red")
     labelError.grid(row=9)
+    updatetimer(countdown)
+    
     root.mainloop()
 
    
