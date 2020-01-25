@@ -17,7 +17,8 @@ defaite= True
 choixJoueur=0
 startList=0
 actuel=""
-
+cible=""
+root =Tk()
 
 
 # objet des liens des pages
@@ -201,40 +202,50 @@ def Main():
 
 
 def interface():
-    root =Tk()
-    positionTour=0
+    global depart
+    global precedent
+    global cible
+    global actuel
+    global proposition
+    global positionTour
     
-    
-    choixNonvalider=True
-    proposition=[]
-    defaite= True
+    positionTour=0    
     choixJoueur=0
     startList=0
     listeDesPropositions = Listbox()
-    actuel=""
     depart= extract()
     precedent=depart
     actuel=depart
-    cible= extract()
+    cible= extract()    
     proposition.append(extractall(actuel.url))
-
+    
 
     def up(list):
         print("up")
         global startList 
         startList += 20
         affichageList(startList,list)
+        print(startList)
     def down(list):
         print("down")
         global startList 
         if startList>0:
             startList -= 20
-            affichageList(startList,list)   
-    def back(list):
-        print("up")
-        global startList 
-        startList += 20
-        affichageList(startList,list)   
+            affichageList(startList,list)
+           
+    def back():
+        global positionTour
+        if nbTour!=0:
+            positionTour-=1
+            global startList 
+            startList = 0
+            global proposition
+            del proposition[-1]
+            global actuel
+            actuel=precedent
+            print(actuel)
+            affichageList(startList,proposition[positionTour]) 
+
     def affichageList(depart,list):
                
         if len(list)<20:
@@ -250,7 +261,7 @@ def interface():
     def validationChoixFrame():
         choixJoueur=propoEntry.get()
         global startList
-        print (startList)
+       
         try:
                 choixJoueur=int(choixJoueur)
                 
@@ -266,20 +277,38 @@ def interface():
                     return -1
     
     def validation():
+        global actuel
+        global proposition
+        global nbTour
+        global positionTour
+        global cible
+        global startList
+      
         
         if gagnant(actuel.url,cible.url):
             print("fff")          
             
-        if nbTour>1:
+        if positionTour>1:
             PageactuelLabel.config(text="Actuellement :{}".format(actuel.nom))
         
-        foo = validationChoixFrame()
-              
-        print(foo)            
+        choix = validationChoixFrame()
+        
+        url=proposition[positionTour][choix]
+        #print(url.url)
+        #print(url.nom)
+        
+        actuel=url
+        proposition.append(extractall(actuel.url))
+        positionTour+=1
+        nbTour+=1
+        startList=0 
+        print(proposition[positionTour][1].nom)
+        affichageList(startList,proposition[positionTour])             
+                  
+#frame d'affichage
 
-
-
-    root.title('************************ WikiGame ********************')
+    
+    root.title('******************** WikiGame ********************')
     root.geometry("400x550")
     topFrame=Frame(root, width =400, height =50).grid(row=0,columnspan=2)
     Label(topFrame,
@@ -302,7 +331,7 @@ def interface():
     Button(frameNavigBouton, text ='précedent',
                command = lambda: down(proposition[positionTour]),height="2",width="8").grid(row =5,column=1, sticky = W)
     Button(frameNavigBouton, text ='retour',
-               command = lambda: back(proposition[positionTour]),height="2",width="8").grid(row =6,column=1, sticky = W)
+               command = lambda: back(),height="2",width="8").grid(row =6,column=1, sticky = W)
     propositionFrame=Frame(root).grid(row=7)
     propoEntry= Entry(propositionFrame)
     propoEntry.grid(row=7,column=0)
