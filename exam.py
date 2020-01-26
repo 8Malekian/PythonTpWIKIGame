@@ -146,11 +146,17 @@ def extractall(elem):
 def gagnant(choix,cible):
     return (choix==cible)
     
-
+#method main pour lancer le programme en mode console(deprecated)
 
 
 def Main():
-   
+    global defaite
+    global positionTour
+    global actuel
+    global startList
+    global precedent
+    global nbTour
+    precedent=depart
     
     while defaite:
         choixNonvalider= True
@@ -197,9 +203,7 @@ def Main():
     
     print("Bravos, vous avez gagnez en {} de tours".format (nbTour+1))
                     
-
-    
-
+#mode graphique pour le wikiGames
 
 
 def interface():
@@ -211,7 +215,6 @@ def interface():
     global positionTour
     
     positionTour=0    
-    choixJoueur=0
     startList=0
     listeDesPropositions = Listbox()
     depart= extract()
@@ -221,12 +224,15 @@ def interface():
     proposition.append(extractall(actuel.url))
     root.after_id= None
 
+    #methode pour afficher les n suivant de la liste
+
     def up(list):
         print("up")
         global startList 
         startList += 20
         affichageList(startList,list)
         print(startList)
+    #methode pour afficher les n precedent de la liste
 
     def down(list):
         print("down")
@@ -234,7 +240,8 @@ def interface():
         if startList>0:
             startList -= 20
             affichageList(startList,list)
-           
+
+    #methode pour revenir au choix du joueur precedent       
     def back():
         global positionTour
         if positionTour!=0:
@@ -248,7 +255,7 @@ def interface():
             PageactuelLabel.config(text="Actuellement :{}".format(actuel.nom))
             print(actuel)
             affichageList(startList,proposition[positionTour]) 
-
+    #methode pour afficher la liste
     def affichageList(depart,list):
                
         if len(list)<20:
@@ -260,7 +267,7 @@ def interface():
             for i in range(depart,(depart+21),1):
                 if i<len(list):
                     listeDesPropositions.insert(i,(i, list[i].nom)) 
-                    
+    #methode pour le timer               
     def updatetimer(count):
         global countdown
         global nbTour
@@ -272,7 +279,7 @@ def interface():
             LabelMessage.config(text="Vous étes au tour: {}".format(nbTour+1))
             labelError.config(text="trop lent,vous avez perdu un tour")
             
-
+    #methode pour valider la proposition du joueur
     def validationChoixFrame():
         choixJoueur=propoEntry.get()
         global startList
@@ -290,7 +297,7 @@ def interface():
         except ValueError:
                     labelError.config(text="Entrer un nombre entre {} et  {} ".format(startList,startList+20))
                     return -1
-    
+    #methode pour les actions à affectuer pour chaque proposition du joueur
     def validation():
         global actuel
         global proposition
@@ -377,5 +384,5 @@ def interface():
 
 interface()     
     
-#extract()   
+#deprecated   
 #Main()   
